@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>C.L.S.C.M.A — DJ / Techno</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #020408;
+      --surface: #060c14;
+      --cyan: #00d4ee;
+      --cyan-dim: #0098b0;
+      --cyan-glow2: rgba(0, 212, 238, 0.05);
+      --white: #e0f0f5;
+      --grey: #4a6070;
+      --grey-light: #7d9dac;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.4; pointer-events: none; z-index: 9997;
+    }
+
+    .grid-bg {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px; z-index: 0; pointer-events: none;
+    }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.5rem 8vw;
+      background: linear-gradient(180deg, rgba(2,4,8,0.9) 0%, transparent 100%);
+      backdrop-filter: blur(4px);
+    }
+    .nav-logo {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem; color: var(--cyan); letter-spacing: 0.25em;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+    .nav-links a {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
+      color: var(--grey-light); text-decoration: none;
+      letter-spacing: 0.2em; text-transform: uppercase; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+    .audio-btn {
+      background: none; border: 1px solid var(--cyan-dim);
+      color: var(--grey-light); font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.2em;
+      padding: 0.4rem 0.9rem; cursor: pointer; transition: all 0.2s;
+    }
+    .audio-btn:hover, .audio-btn.active { border-color: var(--cyan); color: var(--cyan); }
+
+    #hero {
+      position: relative; min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 0 8vw; z-index: 1; overflow: hidden;
+    }
+    .hero-scanline {
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      animation: scanline 4s linear infinite; opacity: 0.6;
+    }
+    @keyframes scanline { 0% { top: -2px; } 100% { top: 100%; } }
+
+    .hero-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(0.65rem, 1.2vw, 0.8rem);
+      color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase;
+      margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.8s 0.3s forwards;
+    }
+    .hero-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 16vw, 16rem);
+      line-height: 0.85; color: var(--white);
+      opacity: 0; animation: fadeUp 0.8s 0.5s forwards;
+    }
+    .hero-name span {
+      display: inline-block; color: var(--cyan);
+      text-shadow: 0 0 20px rgba(0,212,238,0.5);
+      animation: glitch 6s infinite;
+    }
+    @keyframes glitch {
+      0%, 94%, 100% { clip-path: none; transform: none; }
+      95% { clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); transform: translateX(-4px); }
+      96% { clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); transform: translateX(4px); }
+      97% { clip-path: none; transform: none; }
+      98% { clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%); transform: translateX(-2px); }
+      99% { clip-path: none; transform: translateX(0); }
+    }
+    .hero-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(0.8rem, 1.5vw, 1rem);
+      color: var(--grey-light); letter-spacing: 0.15em; margin-top: 2rem;
+      opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+    }
+    .hero-line {
+      position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+      width: 35vw; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan-dim));
+      opacity: 0; animation: fadeIn 1.5s 1.2s forwards;
+    }
+    .waveform {
+      position: absolute; bottom: 4rem; left: 8vw;
+      display: flex; align-items: flex-end; gap: 3px; height: 40px;
+      opacity: 0; animation: fadeIn 1s 1.5s forwards;
+    }
+    .waveform span {
+      display: block; width: 3px; background: var(--cyan); border-radius: 2px;
+      animation: wave 1.2s ease-in-out infinite alternate; opacity: 0.7;
+    }
+    .waveform span:nth-child(odd) { animation-duration: 0.9s; }
+    .waveform span:nth-child(3n) { animation-duration: 1.4s; }
+    @keyframes wave { from { height: 4px; opacity: 0.3; } to { height: 40px; opacity: 1; } }
+    .scroll-hint {
+      position: absolute; bottom: 2rem; right: 8vw;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+      color: var(--grey); letter-spacing: 0.3em;
+      writing-mode: vertical-rl; opacity: 0; animation: fadeIn 1s 2s forwards;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    section { position: relative; z-index: 1; padding: 8rem 8vw; }
+    .section-label {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+      color: var(--cyan); letter-spacing: 0.4em; text-transform: uppercase;
+      margin-bottom: 4rem; display: flex; align-items: center; gap: 1rem;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--cyan-dim), transparent); max-width: 200px;
+    }
+
+    #portfolio { background: var(--surface); }
+    .sc-list { display: flex; flex-direction: column; gap: 1.5rem; }
+    .sc-card {
+      background: var(--bg); border: 1px solid rgba(0,229,255,0.08);
+      padding: 2rem; transition: border-color 0.3s;
+    }
+    .sc-card:hover { border-color: rgba(0,229,255,0.3); }
+    .track-num {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+      color: var(--cyan); letter-spacing: 0.3em; margin-bottom: 0.8rem;
+    }
+    .track-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem;
+      color: var(--white); letter-spacing: 0.05em; margin-bottom: 0.4rem;
+    }
+    .track-meta {
+      font-family: 'Rajdhani', sans-serif; font-size: 0.85rem;
+      color: var(--grey); letter-spacing: 0.1em;
+    }
+    .sc-btn {
+      display: inline-block; margin-top: 1.2rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
+      color: var(--cyan); border: 1px solid var(--cyan-dim);
+      padding: 0.6rem 1.4rem; text-decoration: none;
+      letter-spacing: 0.2em; transition: background 0.2s, color 0.2s;
+    }
+    .sc-btn:hover { background: var(--cyan); color: var(--bg); }
+
+    /* Embed styles */
+    .sc-embed-wrap {
+      margin-top: 1.5rem;
+      border: 1px solid rgba(0,229,255,0.2);
+      overflow: hidden;
+    }
+
+    #sets { background: var(--bg); }
+
+    #contact { background: var(--surface); text-align: center; }
+    .contact-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 7rem); line-height: 1;
+      color: var(--white); margin-bottom: 1rem;
+    }
+    .contact-title span { color: var(--cyan); text-shadow: 0 0 20px rgba(0,212,238,0.5); }
+    .contact-sub {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
+      color: var(--grey-light); letter-spacing: 0.3em; margin-bottom: 3rem;
+    }
+    .contact-email {
+      display: inline-block; font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.2rem, 3vw, 2rem); color: var(--white);
+      text-decoration: none; letter-spacing: 0.1em;
+      border-bottom: 1px solid var(--cyan-dim); padding-bottom: 0.5rem;
+      transition: color 0.2s, border-color 0.2s, text-shadow 0.2s;
+    }
+    .contact-email:hover { color: var(--cyan); border-color: var(--cyan); text-shadow: 0 0 20px var(--cyan); }
+    .contact-form { max-width: 600px; margin: 0 auto 2rem; display: flex; flex-direction: column; gap: 1rem; }
+    .form-row { display: flex; gap: 1rem; }
+    .contact-form input, .contact-form textarea {
+      width: 100%; background: var(--bg);
+      border: 1px solid rgba(0,229,255,0.15); color: var(--white);
+      font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
+      letter-spacing: 0.15em; padding: 0.9rem 1rem;
+      outline: none; transition: border-color 0.2s; resize: none;
+    }
+    .contact-form input::placeholder, .contact-form textarea::placeholder { color: var(--grey); }
+    .contact-form input:focus, .contact-form textarea:focus { border-color: var(--cyan); }
+    .form-btn {
+      background: none; border: 1px solid var(--cyan-dim);
+      color: var(--cyan); font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.25em; padding: 0.9rem 2rem;
+      cursor: pointer; transition: background 0.2s, color 0.2s; align-self: flex-start;
+    }
+    .form-btn:hover { background: var(--cyan); color: var(--bg); }
+    .socials { display: flex; justify-content: center; gap: 2rem; margin-top: 3rem; }
+    .social-link {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+      color: var(--grey); text-decoration: none; letter-spacing: 0.3em;
+      text-transform: uppercase; transition: color 0.2s;
+    }
+    .social-link::before { content: '//'; margin-right: 0.3em; color: var(--cyan-dim); }
+    .social-link:hover { color: var(--cyan); }
+
+    footer {
+      position: relative; z-index: 1; padding: 2rem 8vw;
+      border-top: 1px solid rgba(0,229,255,0.06);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    footer span { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--grey); letter-spacing: 0.2em; }
+    .footer-pulse {
+      width: 6px; height: 6px; background: var(--cyan); border-radius: 50%;
+      animation: pulse 2s infinite; box-shadow: 0 0 6px var(--cyan);
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.6); } }
+
+    .reveal { opacity: 1; transform: translateY(0); transition: opacity 0.7s, transform 0.7s; }
+    .js-ready .reveal { opacity: 0; transform: translateY(40px); }
+    .js-ready .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (pointer: coarse) {
+      .cursor, .cursor-ring { display: none; }
+      body { cursor: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grid-bg"></div>
+
+  <nav>
+    <div class="nav-logo">C.L.S.C.M.A</div>
+    <ul class="nav-links">
+      <li><a href="#contact">Contacte</a></li>
+    </ul>
+  </nav>
+
+  <section id="hero">
+    <div class="hero-scanline"></div>
+    <p class="hero-label">// DJ · Techno · Electronic</p>
+    <h1 class="hero-name"><span>C.L.S.C.M.A</span></h1>
+    <p class="hero-sub">[ FREQ: 140–160 BPM &nbsp;·&nbsp; DARKNESS GUARANTEED ]</p>
+    <div class="hero-line"></div>
+    <div class="waveform">
+      <span style="height:8px; animation-delay:0s"></span>
+      <span style="height:20px; animation-delay:0.1s"></span>
+      <span style="height:12px; animation-delay:0.2s"></span>
+      <span style="height:30px; animation-delay:0.15s"></span>
+      <span style="height:18px; animation-delay:0.3s"></span>
+      <span style="height:35px; animation-delay:0.05s"></span>
+      <span style="height:22px; animation-delay:0.25s"></span>
+      <span style="height:10px; animation-delay:0.4s"></span>
+      <span style="height:28px; animation-delay:0.1s"></span>
+      <span style="height:15px; animation-delay:0.35s"></span>
+      <span style="height:38px; animation-delay:0.2s"></span>
+      <span style="height:20px; animation-delay:0.1s"></span>
+      <span style="height:8px; animation-delay:0.3s"></span>
+      <span style="height:25px; animation-delay:0.15s"></span>
+      <span style="height:32px; animation-delay:0.05s"></span>
+      <span style="height:14px; animation-delay:0.4s"></span>
+    </div>
+    <p class="scroll-hint">SCROLL ↓</p>
+  </section>
+
+  <section id="portfolio">
+    <div class="section-label">// Live Sets</div>
+    <div class="sc-list">
+
+      <div class="sc-card reveal" style="border-color: rgba(0,229,255,0.4);">
+        <p class="track-num">⚡ NEW LIVE SESSION</p>
+        <h3 class="track-title">CLSCMA — Technokrata</h3>
+        <p class="track-meta">Techno · SoundCloud</p>
+        <a href="https://soundcloud.com/joeleedj/clscma-technokrata" target="_blank" class="sc-btn">▶ Escolta a SoundCloud</a>
+      </div>
+
+      <div class="sc-card reveal">
+        <p class="track-num">TRK.001</p>
+        <h3 class="track-title">CLSCMA — Tech Time T1</h3>
+        <p class="track-meta">Techno · SoundCloud</p>
+        <a href="https://soundcloud.com/clscma/closcma_tech_time_part1" target="_blank" class="sc-btn">▶ Escolta a SoundCloud</a>
+      </div>
+
+      <div class="sc-card reveal">
+        <p class="track-num">TRK.002</p>
+        <h3 class="track-title">CLSCMA — Tech Time T2</h3>
+        <p class="track-meta">Techno · SoundCloud</p>
+        <a href="https://soundcloud.com/clscma/tech_time_part2" target="_blank" class="sc-btn">▶ Escolta a SoundCloud</a>
+      </div>
+
+      <div class="sc-card reveal">
+        <p class="track-num">TRK.003</p>
+        <h3 class="track-title">CLSCMA — Pure Tech T1</h3>
+        <p class="track-meta">Techno · SoundCloud</p>
+        <a href="https://soundcloud.com/joeleedj/clscma4" target="_blank" class="sc-btn">▶ Escolta a SoundCloud</a>
+      </div>
+
+      <div class="sc-card reveal">
+        <p class="track-num">TRK.004</p>
+        <h3 class="track-title">CLSCMA — Pure Tech T2</h3>
+        <p class="track-meta">Techno · SoundCloud</p>
+        <a href="https://soundcloud.com/joeleedj/clscma-5-pure-tech-time-part5-january-2021" target="_blank" class="sc-btn">▶ Escolta a SoundCloud</a>
+      </div>
+
+      <div class="sc-card reveal">
+        <p class="track-num">TRK.005</p>
+        <h3 class="track-title">CLSCMA — Pure Tech T3</h3>
+        <p class="track-meta">Techno · SoundCloud</p>
+        <a href="https://soundcloud.com/joeleedj/clscma-6-techno" target="_blank" class="sc-btn">▶ Escolta a SoundCloud</a>
+      </div>
+
+      <div class="sc-card reveal">
+        <p class="track-num">TRK.006</p>
+        <h3 class="track-title">CLSCMA — Techno Castanyada</h3>
+        <p class="track-meta">Techno · SoundCloud</p>
+        <a href="https://soundcloud.com/joeleedj/clscma-09-techno-castanyada-2021" target="_blank" class="sc-btn">▶ Escolta a SoundCloud</a>
+      </div>
+
+      <div class="sc-card reveal">
+        <p class="track-num">TRK.007</p>
+        <h3 class="track-title">CLSCMA — Techno Pod T1</h3>
+        <p class="track-meta">Techno · SoundCloud</p>
+        <a href="https://soundcloud.com/joeleedj/clscma-11-techno-podcast-oct-2022" target="_blank" class="sc-btn">▶ Escolta a SoundCloud</a>
+      </div>
+
+      <div class="sc-card reveal">
+        <p class="track-num">TRK.008</p>
+        <h3 class="track-title">CLSCMA — Techno Pod T2</h3>
+        <p class="track-meta">Techno · SoundCloud</p>
+        <a href="https://soundcloud.com/joeleedj/clscma-techno-december-2022" target="_blank" class="sc-btn">▶ Escolta a SoundCloud</a>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="sets">
+    <div class="section-label">// Sessions en Directe</div>
+    <div style="padding: 4rem 0; text-align: center;">
+      <p style="font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 6vw, 5rem); color: var(--cyan); text-shadow: 0 0 18px rgba(0,212,238,0.45); letter-spacing: 0.1em;">Coming Soon</p>
+      <p style="font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--grey); letter-spacing: 0.3em; margin-top: 1rem;">STAY TUNED</p>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="section-label">// Contacte</div>
+    <h2 class="contact-title reveal">MAKE <span>NOISE</span></h2>
+    <p class="contact-sub reveal">BOOKINGS · COLLABS · PRESS</p>
+
+    <p class="contact-email reveal">clscma@proton.me</p>
+
+    <div class="socials reveal">
+      <a href="https://on.soundcloud.com/F8myeQRdGl4sDBn57D" target="_blank" class="social-link">Soundcloud</a>
+      <a href="https://www.instagram.com/clscma?igsh=MW0zMG1ncDg1OWN1dg==" target="_blank" class="social-link">Instagram</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 C.L.S.C.M.A — ALL RIGHTS RESERVED</span>
+    <div class="footer-pulse"></div>
+    <span>BCN · CAT</span>
+  </footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    document.body.classList.add('js-ready');
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+          e.preventDefault();
+          const target = document.querySelector(a.getAttribute('href'));
+          if (target) target.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    });
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    function sendForm(e) {
+      e.preventDefault();
+      const name = document.getElementById('form-name').value;
+      const email = document.getElementById('form-email').value;
+      const subject = document.getElementById('form-subject').value;
+      const msg = document.getElementById('form-msg').value;
+      const body = encodeURIComponent(`Nom: ${name}\nCorreu: ${email}\n\n${msg}`);
+      window.location.href = `mailto:clscma@proton.me?subject=${encodeURIComponent(subject)}&body=${body}`;
+      document.getElementById('form-ok').style.display = 'block';
+      e.target.reset();
+    }
+
+    let audioCtx = null, playing = false, gainNode = null, oscillators = [], intervalId = null;
+
+    function toggleAudio() {
+      const btn = document.getElementById('audio-btn');
+      if (!playing) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        gainNode = audioCtx.createGain();
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.07, audioCtx.currentTime + 2);
+        gainNode.connect(audioCtx.destination);
+
+        [55, 55.3, 110, 82.5].forEach(freq => {
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.value = freq;
+          g.gain.value = 0.012;
+          osc.connect(g); g.connect(gainNode);
+          osc.start();
+          oscillators.push(osc);
+        });
+
+        const bpm = 138;
+        const beat = 60 / bpm;
+        const kickPat = [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0];
+        const hatPat  = [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,1];
+        let step = 0;
+
+        function playKick(t) {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g); g.connect(gainNode);
+          o.frequency.setValueAtTime(150, t);
+          o.frequency.exponentialRampToValueAtTime(40, t + 0.15);
+          g.gain.setValueAtTime(1, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+          o.start(t); o.stop(t + 0.3);
+        }
+
+        function playHat(t, vol) {
+          const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.05, audioCtx.sampleRate);
+          const data = buf.getChannelData(0);
+          for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+          const src = audioCtx.createBufferSource();
+          src.buffer = buf;
+          const f = audioCtx.createBiquadFilter();
+          f.type = 'highpass'; f.frequency.value = 8000;
+          const g = audioCtx.createGain();
+          g.gain.setValueAtTime(vol * 0.25, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+          src.connect(f); f.connect(g); g.connect(gainNode);
+          src.start(t); src.stop(t + 0.06);
+        }
+
+        function schedule() {
+          const now = audioCtx.currentTime;
+          for (let i = 0; i < 4; i++) {
+            const t = now + i * (beat / 4);
+            const s = (step + i) % 16;
+            if (kickPat[s]) playKick(t);
+            if (hatPat[s]) playHat(t, 1);
+            else playHat(t, 0.1);
+          }
+          step = (step + 4) % 16;
+        }
+
+        schedule();
+        intervalId = setInterval(schedule, beat * 4 * 250);
+        playing = true;
+        btn.textContent = '■ AMBIENT';
+        btn.classList.add('active');
+      } else {
+        gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+        setTimeout(() => {
+          oscillators.forEach(o => { try { o.stop(); } catch(e){}
